@@ -1,0 +1,57 @@
+{
+  "language": "typescript",
+  "app": "npx ts-node main.ts",
+  "projectId": "48fd7c5a-ff39-4174-a061-93c291f93c4b",
+  "sendCrashReports": "false",
+  "terraformProviders": [
+    "hashicorp/aws@~> 6.0"
+  ],
+  "terraformModules": [],
+  "context": {
+    "dev": {
+      "ecrRepoName": "express-app-dev",
+      "clusterName": "express-app-cluster-dev",
+      "serviceName": "express-app-service-dev",
+      "stackName": "express-app-dev-stack",
+      "taskFamily": "express-app-task-dev",
+      "cpu": "256",
+      "memory": "512",
+      "desiredCount": "1",
+      "port": "3000",
+      "vpcCidr": "10.0.0.0/16",
+      "subnetCidr": "10.0.1.0/24",
+      "az": "us-east-1a",
+      "ingressPort": "3000"
+    },
+    "staging": {
+      "ecrRepoName": "express-app-staging",
+      "clusterName": "express-app-cluster-staging",
+      "serviceName": "express-app-service-staging",
+      "stackName": "express-app-staging-stack",
+      "taskFamily": "express-app-task-staging",
+      "cpu": "512",
+      "memory": "1024",
+      "desiredCount": "2",
+      "port": "3000",
+      "vpcCidr": "10.1.0.0/16",
+      "subnetCidr": "10.1.1.0/24",
+      "az": "us-east-1b",
+      "ingressPort": "3000"
+    },
+    "prod": {
+      "ecrRepoName": "express-app",
+      "clusterName": "express-app-cluster",
+      "serviceName": "express-app-service",
+      "stackName": "express-app-stack",
+      "taskFamily": "express-app-task",
+      "cpu": "1024",
+      "memory": "2048",
+      "desiredCount": "3",
+      "port": "3000",
+      "vpcCidr": "10.2.0.0/16",
+      "subnetCidr": "10.2.1.0/24",
+      "az": "us-east-1c",
+      "ingressPort": "3000"
+    }
+  }
+}

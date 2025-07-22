@@ -1,179 +1,76 @@
-# 🚀 DevOps Assessment – Full Lifecycle Challenge
+# 🧪 Full Lifecycle DevOps Project – Express Stack on AWS ECS Fargate
 
-**Estimated Time:** 4–8 hours
-**Level:** Intermediate
-**Focus Areas:** Dockerization · Infrastructure as Code · CI/CD · AWS
+![CI](https://github.com/janus-dev/tv-devops-assessment/actions/workflows/build-and-deploy.yml/badge.svg)
 
----
-
-## 🧩 Overview
-
-You will be working from a pre-built Express.js + TypeScript starter application. Your task is to:
-
-1. Containerize the application and create a local dev environment
-2. Define a production-ready cloud deployment using CDK for Terraform
-3. Automate deployment via GitHub Actions
-
-You **may deploy to your own AWS account for testing**, but your solution must be **fully portable and documented** so we can deploy it into **our AWS environment**.
+This project is a complete solution to the [TurboVets DevOps Assessment](#), implementing a containerized Express.js application with AWS infrastructure managed by CDK for Terraform and CI/CD powered by GitHub Actions.
 
 ---
 
-## 🚀 Get Started
+## 📁 Project Structure
 
-Fork or clone the starter repository:
-
-🔗 https://github.com/TurboVets/tv-devops-assessment
-
-This contains the basic Express app you’ll be building on.
-
----
-
-## 📦 Deliverables
-
-You must submit **one GitHub repository** with the following folder structure in the root:
-
-### 1. `app/`
-
-Contains the application code and:
-
-- `Dockerfile`
-- `docker-compose.yml`
-- GitHub Actions workflows
-- `README.md` with local setup and CI/CD instructions
-
-### 2. `iac/`
-
-Contains the infrastructure code and:
-
-- CDK for Terraform (in TypeScript)
-- Configuration templates
-- `README.md` with deployment instructions for our AWS account
+| Folder   | Description |
+|----------|-------------|
+| `app/`   | Express.js app with Docker, Docker Compose, and CI/CD workflows. See [app/README.md](./app/README.md). |
+| `iac/`   | CDKTF (TypeScript) project defining AWS infrastructure. See [iac/README.md](./iac/README.md). |
+| `s3-backend-setup/`   | S3 Terraform Backend with DynanmoDB as lock table. See [s3-backend-setup/README.md](./s3-backend-setup/README.md). |
 
 ---
 
-## 🧪 Requirements
+## 🐣 Chicken-and-Egg Warnings
 
-### 🔧 Part 1: Docker Compose (Local Dev)
+There are **two important bootstrapping considerations**:
 
-- Create a production-optimized `Dockerfile` (multi-stage build, minimal layers, small image)
-- Create a `docker-compose.yml` to orchestrate the app
-- Add a `.dockerignore` to reduce build context size
-- App must respond to `http://localhost:3000/health`
+1. **Terraform S3 Backend**
+   - The remote backend (S3 + DynamoDB) must be manually created before running `cdktf deploy`.
+   - You’ll find the required permissions and naming in the [s3-backend-setup/README.md](./s3-backend-setup/README.md).
 
----
-
-### ☁️ Part 2: AWS Infrastructure with CDKTF
-
-Use **CDK for Terraform (TypeScript)** to define:
-
-- ECR repository
-- ECS service (Fargate or EC2)
-- VPC, subnets, security groups
-- IAM roles (least privilege)
-- (Optional) Load Balancer or API Gateway
-
-#### AWS Guidelines
-
-- You may deploy to your own AWS account for validation
-- **DO NOT hardcode account IDs, regions, or credentials**
-- All infrastructure must be configurable using:
-  - `cdktf.json`
-  - `.env` or config files
-  - Environment variables
-
-#### Documentation Required
-
-- Include **clear instructions** on how to:
-  - Override variables to use **our AWS account**
-  - Deploy and destroy the stack
-- The final deployment must produce a publicly accessible `/health` endpoint
+2. **ECR Repository Must Exist Before Push**
+   - The ECR repo is created by `cdktf`.
+   - The first GitHub Actions run will fail at the image push step until you’ve run `cdktf deploy` at least once to create the repo.
 
 ---
 
-### 🔁 Part 3: GitHub Actions CI/CD
+## ⚙️ CI/CD Setup
 
-Set up GitHub Actions to:
+GitHub Actions automates:
 
-- Trigger on push to `main`
-- Build and tag a Docker image
+- Build & tag Docker image (`short SHA`)
 - Push to ECR
-- Deploy via `cdktf deploy`
+- Deploy using `cdktf`
 
-#### Workflow Requirements
+Environments supported:
 
-- Use GitHub Secrets to store:
-  - `AWS_ACCESS_KEY_ID`
-  - `AWS_SECRET_ACCESS_KEY`
-  - Any other required env vars
-- Parameterize everything (ECR URI, region, etc.)
-- Include instructions for configuring secrets
-- Add a CI badge to the `README.md`
+| Git Ref             | Environment |
+|---------------------|-------------|
+| Any feature branch  | `dev`       |
+| `main` branch       | `staging`   |
+| Git tag (`v*`)      | `prod`      |
 
----
-
-## 🎥 Required: 2–5 Minute Walkthrough Video
-
-Record a screen-share video where you walk through:
-
-- Your Docker and Compose setup
-- CDKTF constructs and structure
-- GitHub Actions workflows
-- How we can configure and deploy it in our AWS account
-- Any challenges or decisions worth noting
-
-You do not need to appear on camera.
+> Full instructions for configuring secrets/variables are in both `app/` and `iac/` READMEs.
 
 ---
 
-## ✅ Evaluation Criteria
+## 🌐 /health Check
 
-| Area             | Expectation                                                              |
-|------------------|---------------------------------------------------------------------------|
-| **Docker Setup** | Clean, production-ready image; Compose works locally                     |
-| **IaC Quality**  | CDKTF code is modular, portable, and secure                              |
-| **CI/CD Flow**   | GitHub Actions runs cleanly; secrets handled properly                    |
-| **Portability**  | Can be deployed in our AWS account without code changes                  |
-| **Documentation**| Detailed, step-by-step usage and setup instructions                      |
-| **Security**     | No hardcoded secrets or account info; uses IAM and GitHub Secrets        |
-| **Communication**| Clear, concise walkthrough video explaining design and deployment        |
+The deployed service exposes a `/health` route over HTTP (port 3000). Each environment has its own ECS cluster and ECR repo.
 
----
+## 🖼️ Visual Proof of Deployment
+To demonstrate that the infrastructure and application were deployed correctly across all environments, please refer to the following documentation containing screenshots:
 
-## 🧠 Bonus Points
+👉 See [proof-of-deployment/README.md](./proof-of-deployment/README.md).
 
-- Add Route53 and HTTPS
-- CloudWatch logs and alerts
-- Support multiple environments (dev/staging/prod)
-- Use remote Terraform backend (S3 + DynamoDB)
+This includes:
+
+- S3 + DynamoDB backend verification
+- ECR repository existence
+- ECS service running successfully
+- CI/CD GitHub Actions history
 
 ---
 
-## 📥 Submission Instructions
+## 📚 Referenced Docs
 
-Submit a single GitHub repository containing both `app/` and `iac/`.
-
-Then share:
-
-- ✅ GitHub repo link
-- ✅ Video walkthrough link (Loom, Google Drive, YouTube, etc.)
-- ✅ (Optional) Any extra notes or setup info we should know
-
----
-
-## 🔐 Grant GitHub Access
-
-Please add the following as **Admin Collaborators** to your GitHub repository:
-
-- `ana@turbovets.com`
-- `dean@turbovets.com`
-- `charishma@turbovets.com`
-
-### How to Add Admins
-
-1. Open your repo on GitHub
-2. Go to **Settings → Collaborators and teams**
-3. Click **Invite a collaborator**
-4. Enter the emails above
-5. Set access level to **Admin**
-
-This gives us access to CI history, secrets, and workflow configurations for review.
+- [`app/README.md`](./app/README.md) – local dev, Docker, GitHub Actions setup
+- [`iac/README.md`](./iac/README.md) – CDKTF stack, configuration, and deployment
+- [`s3-backend-setup/README.md`](./s3-backend-setup/README.md) – Terraform S3 Backend setup with DynanmoDB as lock table
+- [proof-of-deployment/README.md](./proof-of-deployment/README.md) - Visual Proof of Deployment
