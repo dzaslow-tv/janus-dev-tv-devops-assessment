@@ -1,0 +1,31 @@
+# Node modules (installed fresh in container)
+node_modules
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+
+# Tests (optional, exclude if not required in production)
+tests
+coverage
+
+# Local builds and temp files
+dist
+temp
+tmp
+
+# IDE & Editor files
+.vscode
+.idea
+*.swp
