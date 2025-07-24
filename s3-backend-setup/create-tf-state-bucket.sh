@@ -9,7 +9,7 @@
 DEFAULT_REGION=us-east-1
 BUCKET_PREFIX=terraform-state
 BUCKET_NAME="${BUCKET_PREFIX}-$(uuidgen | tr '[:upper:]' '[:lower:]' | cut -d'-' -f1)" # Unique bucket name
-DYNAMODB_TABLE_NAME="terraform-lock-table"
+DYNAMODB_TABLE_NAME="tv-assessment-terraform-lock-table"
 
 # Check if AWS CLI is configured
 if ! aws sts get-caller-identity &>/dev/null; then
